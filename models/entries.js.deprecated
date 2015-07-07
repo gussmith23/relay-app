@@ -1,0 +1,31 @@
+var mongo = require('mongodb').MongoClient;
+var assert = require('assert');
+
+var url = "mongodb://localhost:27017/relay";
+
+exports.create = function(name, time) {
+
+    mongo.connect(url, function(err, db) {
+        
+        assert.equal(null, err);
+
+        var collection = db.collection('fact');
+
+        collection.insert(
+            {
+                "name" : name,
+                "time" : time
+            },
+            function(err, result) {
+                
+                assert.equal(null, err);
+                console.log("Insert successful. Result:");
+                console.log(result);
+
+            });
+
+    });
+
+}
+
+module.exports = exports;

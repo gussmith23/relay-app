@@ -1,0 +1,22 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.sidebar .teamNameContainer {
+  margin: 10px;
+  padding: 10px;
+}
+
+.teamNameContainer .teamName {
+  display: inline;
+}
+
+.teamNameContainer .numLaps {
+  display: inline;
+  float: right;
+}

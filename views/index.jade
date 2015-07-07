@@ -1,0 +1,80 @@
+extends layout
+block content
+  head
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    link(href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen")
+    link(href="stylesheets/style.css" rel="stylesheet")
+    script(src='jquery/jquery-1.11.1.js')
+    script(src='jsapi/jsapi.js')
+    script(src="bootstrap/js/bootstrap.min.js")
+    script(src='socketio/socket.io-1.2.0.js')
+    script.
+      google.load('visualization', '1.0', {'packages':['corechart']});
+    script.
+      var socket = io();
+      
+      socket.on('update ranking by lap', function(data) {
+      
+        console.log("Updating rankings by lap. Data:");
+        console.dir(data);
+        
+        // Clear out table.
+        $('.lapRankingsTable').empty();
+        
+        // Create header.
+        var header = $(document.createElement('tr'));
+        header.append($(document.createElement('th')).text('Place'));
+        header.append($(document.createElement('th')).text('Team Name'));
+        header.append($(document.createElement('th')).text('Laps'));
+        $('.lapRankingsTable').append(header);
+
+        data.forEach(
+          function(currentValue, index) { // teams.name, teams.color, teams.textcolor, COUNT(fact.uid)
+                        
+            /*var container = $(document.createElement('div'))
+              .addClass('teamNameContainer')
+              .css('color',currentValue[2])
+              .css('background-color',currentValue[1]);
+            var teamName = $(document.createElement('div'))
+              .addClass('teamName')
+              .text(currentValue[0]);
+            var numLaps = $(document.createElement('div'))
+              .addClass('numLaps')
+              .text(currentValue[3]);*/
+              
+            var tableRow = $(document.createElement('tr'))
+              .css('color',currentValue[2])
+              .css('background-color',currentValue[1]);
+            var place = $(document.createElement('td'))
+              .text(index+1);
+            var teamName = $(document.createElement('td'))
+              .text(currentValue[0]);
+            var numLaps = $(document.createElement('td'))
+              .text(currentValue[3]);
+            
+            
+            tableRow.append(place);
+            tableRow.append(teamName);
+            tableRow.append(numLaps);
+          
+            $('.lapRankingsTable').append(tableRow);
+          }
+        );
+
+      });
+      
+      $(document).ready(function(){
+        console.log("ready! test.");
+        socket.emit('request refresh'); // When the doc is ready, request a refresh.
+      });
+      
+  body
+    div.container-fluid
+      div.row-fluid
+        div.span4.sidebar 
+          table.table.lapRankingsTable
+            tr
+              th Place
+              th Team Name
+              th Laps
+        div.span8 

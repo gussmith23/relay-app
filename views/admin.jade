@@ -1,0 +1,39 @@
+extends layout
+block content
+  head
+    meta(name="viewport" content="width=device-width, initial-scale=1.0")
+    link(href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen")
+    script(src='jquery/jquery-1.11.1.js')
+    script(src="bootstrap/js/bootstrap.min.js")
+    script(src='socketio/socket.io-1.2.0.js')
+    script.
+      var socket = io();
+      socket.on('new fact', function(data) {
+        console.log("New fact in; inserting into text box.");
+        $('#uid').attr('value',data.uid);
+      });
+  body
+    h1 Admin Panel
+    script(src="bootstrap/js/bootstrap.min.js")
+    h2 Add Team
+      form(action='new-team',method='POST')
+        strong Team Name:
+        br
+        input(type = 'text', name = 'teamname')
+        br
+        strong UID: 
+        br
+        input#uid(type = 'text', name = 'uid') 
+        br
+        strong Color:
+        br
+        em Examples of supported color formats: #ff0000, rgb(255, 0, 0), rgba(255, 0, 0, 0.3), hsl(120, 100%, 50%),hsla(120, 100%, 50%, 0.3), or any predefined CSS colors.
+        br
+        input(type = 'text', name = 'color')
+        br
+        strong Text color:
+        br
+        input(type = 'text', name = 'textcolor')
+        br
+        input(type = 'submit')
+        
