@@ -63,18 +63,93 @@ block content
 
       });
       
+      socket.on('update ranking by minimum lap time', function(data) {
+      
+        // Clear out table.
+        $('.minimumLapTimeRankingsTable').empty();
+        
+        // Create header.
+        var header = $(document.createElement('tr'));
+        header.append($(document.createElement('th')).text('Place'));
+        header.append($(document.createElement('th')).text('Team Name'));
+        header.append($(document.createElement('th')).text('Minimum Lap Time'));
+        $('.minimumLapTimeRankingsTable').append(header);
+
+        data.forEach(
+          function(currentValue, index) { // teams.name, teams.color, teams.textcolor, minimumLapTime
+                       
+            var tableRow = $(document.createElement('tr'))
+              .css('color',currentValue[2])
+              .css('background-color',currentValue[1]);
+            var place = $(document.createElement('td'))
+              .text(index+1);
+            var teamName = $(document.createElement('td'))
+              .text(currentValue[0]);
+            var minimumLapTime = $(document.createElement('td'))
+              .text(currentValue[3]);
+            
+            
+            tableRow.append(place);
+            tableRow.append(teamName);
+            tableRow.append(minimumLapTime);
+          
+            $('.minimumLapTimeRankingsTable').append(tableRow);
+          }
+        );
+
+      });
+      
+      socket.on('update main table', function(data) {
+      
+        // Clear out table.
+        $('.mainTable').empty();
+        
+        // Create header.
+        var header = $(document.createElement('tr'));
+        header.append($(document.createElement('th')).text('Place'));
+        header.append($(document.createElement('th')).text('Team Name'));
+        header.append($(document.createElement('th')).text('Number of Laps'));
+        header.append($(document.createElement('th')).text('Minimum Lap Time'));
+        $('.mainTable').append(header);
+
+        data.forEach(
+          function(currentValue, index) { // teams.name, teams.color, teams.textcolor, numLaps, minimumLapTime
+                       
+            var tableRow = $(document.createElement('tr'))
+              .css('color',currentValue[2])
+              .css('background-color',currentValue[1]);
+            var place = $(document.createElement('td'))
+              .text(index+1);
+            var teamName = $(document.createElement('td'))
+              .text(currentValue[0]);
+            var numLaps = $(document.createElement('td'))
+              .text(currentValue[3]);
+            var minimumLapTime = $(document.createElement('td'))
+              .text(currentValue[4]);
+            
+            
+            tableRow.append(place);
+            tableRow.append(teamName);
+            tableRow.append(numLaps);
+            tableRow.append(minimumLapTime);
+          
+            $('.mainTable').append(tableRow);
+          }
+        );
+
+      });
+      
       $(document).ready(function(){
         console.log("ready! test.");
         socket.emit('request refresh'); // When the doc is ready, request a refresh.
       });
       
   body
-    div.container-fluid
-      div.row-fluid
-        div.span4.sidebar 
-          table.table.lapRankingsTable
-            tr
-              th Place
-              th Team Name
-              th Laps
-        div.span8 
+    div.container-fluid.container
+      div.row-fluid.top
+      div.row-fluid.middle
+        div.left
+        div.mainTableContainer
+          table.table.mainTable
+        div.right
+      div.row-fluid.bottom

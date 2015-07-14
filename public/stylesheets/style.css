@@ -1,10 +1,28 @@
+html {
+  height: 100%;
+  width: 100%;
+}
+
 body {
-  padding: 50px;
+  /*padding: 50px;*/
+  padding: 0px;
+  margin: 0px;
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+  height: 100%;
+  width: 100%;
 }
 
 a {
   color: #00B7FF;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  margin: 0px;
+  padding: 0px;
 }
 
 .sidebar .teamNameContainer {
@@ -19,4 +37,42 @@ a {
 .teamNameContainer .numLaps {
   display: inline;
   float: right;
+}
+
+.track {
+  border: 75px solid #FF5E47;
+  border-radius: 75px;
+  padding: 5px;
+}
+
+.top {
+  flex: 2;
+  border: 1px solid black;
+}
+
+.middle {
+  flex: 18;  
+  border: 1px solid black;
+  display: flex;
+  flex-direction: row;
+}
+
+.bottom {
+  flex: 3;
+  border: 1px solid black;
+}
+
+.right {
+  flex: 2; 
+  border: 1px solid black;
+}
+
+.mainTableContainer{
+  flex: 4;
+  border: 1px solid black;
+}
+
+.left {
+  flex: 2;
+  border: 1px solid black;
 }

@@ -1,9 +1,11 @@
 //var mongoFactory = require('mongo-factory');
 var dblite = require('dblite');
-var db = dblite('db.sqlite');
 var assert = require('assert');
 
 module.exports = function(io) {
+  
+  var db = dblite('db.sqlite'); // This may be a bad idea...i'm putting these here to test why holding
+                                // tag to receiver crashes the system.
   
   console.log("Updating lap rankings.");
   
@@ -12,6 +14,7 @@ module.exports = function(io) {
     "FROM fact " +
     "LEFT JOIN teams " +
     "ON fact.uid = teams.uid " +
+    "WHERE teams.name IS NOT NULL " +
     "GROUP BY fact.uid " +
     "ORDER BY COUNT(fact.uid) DESC " +
     "LIMIT 10",                       // Get the top 10
@@ -19,7 +22,7 @@ module.exports = function(io) {
       
       assert.equal(err, null);
       
-      console.log("Current rankings:");
+      console.log("Current rankings by number of laps:");
       console.log(rows);
       
       // Emit.
