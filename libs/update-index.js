@@ -1,6 +1,11 @@
 var update_rankingByLap = require('index-update-scripts/ranking-by-lap');
 var update_minimumLapTime = require('index-update-scripts/minimum-lap-time');
 var update_mainTable = require('index-update-scripts/main-table');
+var update_totalLaps = require('index-update-scripts/total-laps');
+var update_latestLandmark = require('index-update-scripts/latest-landmark');
+var update_nextLandmark = require('index-update-scripts/next-landmark');
+
+
 var io = null;
 
 // Inject io object.
@@ -16,5 +21,8 @@ module.exports.updateIndex = function() {
   //update_rankingByLap(io);
   //update_minimumLapTime(io);
   update_mainTable(io);
+  update_totalLaps(io);
+  update_latestLandmark(io);
+  update_nextLandmark(io);
   
 }

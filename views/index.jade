@@ -13,10 +13,13 @@ block content
     script.
       var socket = io();
       
-      socket.on('update ranking by lap', function(data) {
+      socket.on('update total laps', function(data) {
       
-        console.log("Updating rankings by lap. Data:");
-        console.dir(data);
+        $('.totalLaps').text(data);
+      
+      });
+      
+      socket.on('update ranking by lap', function(data) {
         
         // Clear out table.
         $('.lapRankingsTable').empty();
@@ -139,16 +142,68 @@ block content
 
       });
       
+      socket.on('update latest landmark', function(data) {
+        $('.latestLandmark').text("Latest landmark: " + data[0]);
+      });
+      
+      socket.on('update next landmark', function(data) {
+        $('.nextLandmark').text("Next landmark: " + data[0] + " in " + Math.round(data[2]) + " miles!");
+      });
+
+      function startTime() {
+        
+        var endDate = new Date("Sat Jul 25 2015 23:00:00 GMT-0400 (Eastern Daylight Time)");
+        var today=new Date();
+        
+        var h, m, s;
+        
+        // Local time
+        h=today.getHours();
+        if (h > 12) h -= 12;
+        m=today.getMinutes();
+        s=today.getSeconds();
+        m = checkTime(m);
+        s = checkTime(s);
+        $('.time').text(h+":"+m+":"+s);
+        
+        // Time remaining
+        var timeRemaining = endDate.getTime() - today.getTime();
+        h = Math.round(timeRemaining / (1000 * 60 * 60));
+        timeRemaining = timeRemaining % (1000 * 60 * 60); // only minutes remain...
+        m = Math.round(timeRemaining / (1000 * 60));
+        timeRemaining = timeRemaining % (1000 * 60); // only seconds remain...
+        s = Math.round(timeRemaining / 1000);
+        m = checkTime(m);
+        s = checkTime(s);
+        $('.timeRemaining').text(h+":"+m+":"+s);
+        
+        // Refresh in 0.5 seconds
+        var t = setTimeout(function(){startTime()},500);
+      }
+
+      function checkTime(i) {
+        if (i<10) {i = "0" + i};  // add zero in front of numbers < 10
+        return i;
+      }
+      
       $(document).ready(function(){
-        console.log("ready! test.");
+      
         socket.emit('request refresh'); // When the doc is ready, request a refresh.
+
+        // Start time
+        startTime();
       });
       
   body
     div.container-fluid.container
       div.row-fluid.top
+        div.time
+        div.totalLaps
+        div.timeRemaining
       div.row-fluid.middle
         div.left
+          div.latestLandmark
+          div.nextLandmark
         div.mainTableContainer
           table.table.mainTable
         div.right

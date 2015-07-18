@@ -28,7 +28,7 @@ module.exports = function(io) {
   console.log("Updating main table.");
   
   db.query(queryStatement, function(err, rows) {
-    console.log("Main table SQL query returned " + rows.length + " rows.");
+    //console.log("Main table SQL query returned " + rows.length + " rows.");
     
     io.emit('update main table', rows);
   });
