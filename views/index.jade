@@ -66,40 +66,13 @@ block content
 
       });
       
-      socket.on('update ranking by minimum lap time', function(data) {
+      socket.on('update lowest lap time', function(data) {
+         $('.lowestLapTime').text("Lowest lap time: " + data[0][3] + " from team " + data[0][0]);
+      });
       
-        // Clear out table.
-        $('.minimumLapTimeRankingsTable').empty();
-        
-        // Create header.
-        var header = $(document.createElement('tr'));
-        header.append($(document.createElement('th')).text('Place'));
-        header.append($(document.createElement('th')).text('Team Name'));
-        header.append($(document.createElement('th')).text('Minimum Lap Time'));
-        $('.minimumLapTimeRankingsTable').append(header);
-
-        data.forEach(
-          function(currentValue, index) { // teams.name, teams.color, teams.textcolor, minimumLapTime
-                       
-            var tableRow = $(document.createElement('tr'))
-              .css('color',currentValue[2])
-              .css('background-color',currentValue[1]);
-            var place = $(document.createElement('td'))
-              .text(index+1);
-            var teamName = $(document.createElement('td'))
-              .text(currentValue[0]);
-            var minimumLapTime = $(document.createElement('td'))
-              .text(currentValue[3]);
-            
-            
-            tableRow.append(place);
-            tableRow.append(teamName);
-            tableRow.append(minimumLapTime);
-          
-            $('.minimumLapTimeRankingsTable').append(tableRow);
-          }
-        );
-
+      socket.on('update lowest average lap time', function(data) {
+      console.dir(data);
+         $('.lowestAverageLapTime').text("Lowest average lap time: " + data[0][3] + " from team " + data[0][0]);
       });
       
       socket.on('update main table', function(data) {
@@ -148,6 +121,10 @@ block content
       
       socket.on('update next landmark', function(data) {
         $('.nextLandmark').text("Next landmark: " + data[0] + " in " + Math.round(data[2]) + " miles!");
+      });
+      
+      socket.on('update team milestone', function(data) {
+        $('.teamMilestones').text("Latest team milestone: " + data.milestoneName + " from " + data.teamName);
       });
 
       function startTime() {
@@ -202,9 +179,16 @@ block content
         div.timeRemaining
       div.row-fluid.middle
         div.left
-          div.latestLandmark
-          div.nextLandmark
+          div.landmarksContainer
+            div.latestLandmark
+            div.nextLandmark
+          div.lapTimeRecordsContainer
+            div.lowestLapTime
+            div.lowestAverageLapTime
         div.mainTableContainer
           table.table.mainTable
         div.right
+          div.teamMilestonesContainer
+            div.teamMilestones
+          div.logoContainer
       div.row-fluid.bottom

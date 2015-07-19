@@ -3,14 +3,13 @@ var db = dblite('db.sqlite');
 var assert = require('assert');
 var updateIndex = require('update-index').updateIndex;
 var minTimeBetweenLapsSeconds = require('config').minLapTime; 
-var io = null;
+var update_teamMilestones = require('index-update-scripts/team-milestones');
 
 module.exports.setIo = function(ioInstance) {
-  io = ioInstance;
 }
 
 // Adds lap, checking first that the lap is valid - NOTE: this means that a document isn't guaranteed to be inserted!
-module.exports.addLap = function(uid) {
+module.exports.addLap = function(uid, io) {
   
   db.query("SELECT * FROM fact WHERE uid = ? AND Timestamp > DATETIME('now','-? seconds')", [uid, minTimeBetweenLapsSeconds],  
     function(err, rows) {
@@ -32,7 +31,13 @@ module.exports.addLap = function(uid) {
           'INSERT INTO fact (uid) VALUES (?)',
           [uid],
           function(err,data) { // Note: have to put data argument in here to get err object. (with single arg, it's func(data))
+             
+             // Update all metrics on index.
              updateIndex();
+             
+             // Update specific team milestones.
+             update_teamMilestones(io, uid);
+             
              /**
               * TODO
               * Ideally, we'd check for INSERT failures due to foreign key constraints. 

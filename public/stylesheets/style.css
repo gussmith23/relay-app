@@ -65,6 +65,9 @@ a {
 .right {
   flex: 2; 
   border: 1px solid black;
+  
+  display: flex;
+  flex-direction: column;
 }
 
 .mainTableContainer{
@@ -75,4 +78,28 @@ a {
 .left {
   flex: 2;
   border: 1px solid black;
+  
+  display: flex;
+  flex-direction: column;
 }
+
+.landmarksContainer {
+  flex: 1;
+}
+
+.lapTimeRecordsContainer {
+  flex: 1;
+}
+
+.teamMilestonesContainer {
+  flex: 1;
+}
+
+.logoContainer {
+  flex: 1;
+  background-image: url("/images/relaylogo.jpg");
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center center;
+}
+

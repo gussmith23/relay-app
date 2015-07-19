@@ -12,7 +12,7 @@ module.exports = function(io) {
   
   console.log('Received JSON:\n%j', req.body);
  
-  factModel.addLap(req.body.uid);
+  factModel.addLap(req.body.uid, io);
   
   // Emit.
   io.emit('new fact', req.body);
