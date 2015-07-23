@@ -25,7 +25,11 @@ module.exports.addLap = function(uid, io) {
       if (rows.length == 0) { // TODO does this actually work?
       
         console.log("Valid lap time!");
-        
+    
+         // Tell the browser that a lap just went in.
+         io.emit('valid lap',{});
+         
+         
         db.query(
           'PRAGMA foreign_keys = ON;' +         // Turn on foreign key constraints. Must be done here in the query!
           'INSERT INTO fact (uid) VALUES (?)',
@@ -37,6 +41,7 @@ module.exports.addLap = function(uid, io) {
              
              // Update specific team milestones.
              update_teamMilestones(io, uid);
+             
              
              /**
               * TODO

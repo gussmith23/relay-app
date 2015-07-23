@@ -1,6 +1,10 @@
 html {
   height: 100%;
   width: 100%;
+  
+  overflow: hidden;
+  
+  font-size: 18pt;
 }
 
 body {
@@ -10,6 +14,8 @@ body {
   font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
   height: 100%;
   width: 100%;
+  
+  font-family: 'opensans';
 }
 
 a {
@@ -47,7 +53,21 @@ a {
 
 .top {
   flex: 2;
-  border: 1px solid black;
+  background-color:#3C0C7A;
+  color: white;
+}
+
+.topTable {
+  table-layout: fixed;
+  width: 100%;
+  height: 100%;
+  padding: 10% 10% 0px 10%;
+  font-size: 1rem;
+}
+
+.topTable td {
+  text-align: center;
+  font-size: 1.5rem;
 }
 
 .middle {
@@ -58,8 +78,12 @@ a {
 }
 
 .bottom {
+  display: flex;
+  flex-direction: row;
+
   flex: 3;
   border: 1px solid black;
+  overflow: hidden;
 }
 
 .right {
@@ -73,6 +97,17 @@ a {
 .mainTableContainer{
   flex: 4;
   border: 1px solid black;
+  background-image: url("/images/grass.jpg");
+  background-size: cover;
+}
+
+.mainTable th {
+  font-size: 1rem;
+  color: white;
+}
+
+.mainTable td {
+  font-size: 1rem;
 }
 
 .left {
@@ -83,16 +118,128 @@ a {
   flex-direction: column;
 }
 
+.landmarksBackgroundImage {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index:0;
+  filter: blur(5px) brightness(78%);
+  background-position: center center;
+  
+  /* stretch out image to remove white blur at edges. */
+  height: 110%;
+  width: 110%;
+  margin: -10px;
+}
+
 .landmarksContainer {
+  overflow: hidden;
+
+  position: relative;
+  top: 0;
+  left: 0;
+  z-index:1;
+
   flex: 1;
+  background-position: center center;
+  
+  
+  height: 100%;
+  width: 100%;
+}
+
+.landmarksInnerContainer {
+  position: relative;
+  top: 0;
+  left: 0;
+  z-index:1;
+  font-size: 1.5rem;
+  color: white;
+  padding: 10px;
+  
+}
+
+.latestLandmark {
+  text-align: left;
+}
+
+.nextLandmark {
+  text-align: right;
 }
 
 .lapTimeRecordsContainer {
   flex: 1;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
+  font-size: 1.1rem;
 }
 
-.teamMilestonesContainer {
+.lapTimeRecordsContainer b {
+  font-size: 1.5em;
+}
+
+.lapTimeRecordsContainer p {
+  vertical-align: middle;
+}
+
+.lowestLapTime, .lowestAverageLapTime {
   flex: 1;
+  padding: 10px;
+}
+
+/*
+.mainTable>tbody:nth-child(1) {
+  height: 30px;
+}
+
+.mainTable>tbody:nth-child(2),.mainTable>tbody:nth-child(3),.mainTable>tbody:nth-child(4),.mainTable>tbody:nth-child(5),.mainTable>tbody:nth-child(6) {
+  height:50px;
+}*/
+
+.mainTable.table td {
+  vertical-align: middle;
+  text-align: center;
+  font-weight: bold;
+}
+
+
+.teamMilestonesContainer {
+  position: relative;
+  left: 0;
+  top: 0;
+  flex: 1;
+}
+
+.teamMilestonesContainer iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.teamMilestones {
+  text-align: center;
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  padding-top:25px;
+}
+
+.teamMilestones > * {
+  background-color: white;
+  color: black;
+  font-size: 1.2rem;
+  display: inline-block;
+  margin-bottom: 22px;
+  box-shadow: 5px 5px #8D8B8B;
+}
+
+.teamMilestones > br {
+  margin-top: 22px;
 }
 
 .logoContainer {
@@ -103,3 +250,112 @@ a {
   background-position: center center;
 }
 
+.startBlock {
+  background-color: green;
+  flex: 1;
+}
+.startBlock>div {
+  transform: rotate(-90deg);
+  transform-origin: 100% 50% 0px;
+  position: relative;
+  left: -30px;
+  text-align: center;
+  color: #FFF;
+  font-size: 1.5rem;
+  top: -20px;
+}
+
+.finishBlock {
+  background-color: red;
+  flex: 1;
+}
+.finishBlock>div {
+  transform: rotate(-90deg);
+  transform-origin: 100% 50% 0px;
+  position: relative;
+  left: -30px;
+  text-align: center;
+  color: #FFF;
+  font-size: 1.5rem;
+  top: -20px;
+}
+
+.rowsContainer {
+  flex: 10;
+
+  display: flex;
+  flex-direction: column;
+  max-height: 100%;
+  height: 100%;
+}
+
+.runnerRow {
+  flex: 1;
+  position: relative;
+  background-image: url("/images/track.jpg");
+  border-top: 2px solid white;
+  border-bottom: 2px solid white;
+}
+
+.runnerRow>.teamName {
+  display: inline;
+  font-size: 1.75em;
+}
+
+.runnerImage {
+  max-height: 100%;
+  height: auto;
+  width: auto;
+  position: absolute;
+  z-index:1;
+}
+
+@font-face {
+  font-family: 'arvo';
+  font-weight: normal;
+  font-style: normal;
+  src: url('/fonts/arvo/Arvo-Regular.ttf');
+}
+@font-face {
+  font-family: 'arvo';
+  font-weight: bold;
+  font-style: normal;
+  src: url('/fonts/arvo/Arvo-Bold.ttf');
+}
+@font-face {
+  font-family: 'arvo';
+  font-weight: normal;
+  font-style: italic;
+  src: url('/fonts/arvo/Arvo-Italic.ttf');
+}
+@font-face {
+  font-family: 'arvo';
+  font-weight: bold;
+  font-style: italic;
+  src: url('/fonts/arvo/Arvo-BoldItalic.ttf');
+}
+
+@font-face {
+  font-family: 'opensans';
+  font-weight: normal;
+  font-style: normal;
+  src: url('/fonts/opensans/OpenSans-Regular.ttf');
+}
+@font-face {
+  font-family: 'opensans';
+  font-weight: bold;
+  font-style: normal;
+  src: url('/fonts/opensans/OpenSans-Bold.ttf');
+}
+@font-face {
+  font-family: 'opensans';
+  font-weight: normal;
+  font-style: italic;
+  src: url('/fonts/opensans/OpenSans-Italic.ttf');
+}
+@font-face {
+  font-family: 'opensans';
+  font-weight: bold;
+  font-style: italic;
+  src: url('/fonts/opensans/OpenSans-BoldItalic.ttf');
+}

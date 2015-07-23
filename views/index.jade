@@ -1,6 +1,8 @@
 extends layout
 block content
   head
+    audio.bell
+      source(src="/sounds/bell.wav" type="audio/wav")
     meta(name="viewport" content="width=device-width, initial-scale=1.0")
     link(href="bootstrap/css/bootstrap.min.css" rel="stylesheet" media="screen")
     link(href="stylesheets/style.css" rel="stylesheet")
@@ -11,7 +13,15 @@ block content
     script.
       google.load('visualization', '1.0', {'packages':['corechart']});
     script.
-      var socket = io();
+      var socket = io();        
+      var endDate = new Date("Sat Jul 25 2015 23:00:00 GMT-0400 (Eastern Daylight Time)");
+      
+      socket.on('valid lap', function(data) {
+        var audio = $('audio.bell')[0];
+        audio.pause();
+        audio.currentTime = 0;
+        audio.play();
+      });
       
       socket.on('update total laps', function(data) {
       
@@ -67,15 +77,34 @@ block content
       });
       
       socket.on('update lowest lap time', function(data) {
-         $('.lowestLapTime').text("Lowest lap time: " + data[0][3] + " from team " + data[0][0]);
+        
+        var timeNum = data[0][3];
+        var timeName = timeNum == 1 ? "second" : "seconds";
+      
+         $('.lowestLapTime')
+          .css('background-color',data[0][1])
+          .css('color',data[0][2])
+          .html("<p><i>Lowest lap time: </i><b>" + data[0][0] + " </b>with<b> " + timeNum + "</b> " + timeName + "!</p>");
       });
       
       socket.on('update lowest average lap time', function(data) {
-      console.dir(data);
-         $('.lowestAverageLapTime').text("Lowest average lap time: " + data[0][3] + " from team " + data[0][0]);
+        console.dir(data);
+        
+        var timeNum = Math.round(data[0][3]);
+        var timeName = timeNum == 1 ? "second" : "seconds";
+      
+        $('.lowestAverageLapTime')
+          .css('background-color',data[0][1])
+          .css('color',data[0][2])
+          .html("<p><i>Lowest average lap time: </i><b>" + data[0][0] + " </b>with<b> " + timeNum + "</b> " + timeName + "!</p>");
       });
       
       socket.on('update main table', function(data) {
+      
+        // first N rows to enlarge.
+        var numBigRows = 5;
+        // The max number of pixels to edge the top rows out
+        var maxEdgeOut = 20;
       
         // Clear out table.
         $('.mainTable').empty();
@@ -90,6 +119,16 @@ block content
 
         data.forEach(
           function(currentValue, index) { // teams.name, teams.color, teams.textcolor, numLaps, minimumLapTime
+            
+            var min = Math.floor(currentValue[4]/60);
+            var sec = currentValue[4]%60;
+            
+            var edgeOut = 20 * ((numBigRows-index)/numBigRows);
+            
+            var lapTimeString = "" 
+              + (min < 10 ? "0" + min : min)
+              + ":" 
+              + (sec < 10 ? "0" + sec : sec);
                        
             var tableRow = $(document.createElement('tr'))
               .css('color',currentValue[2])
@@ -101,13 +140,32 @@ block content
             var numLaps = $(document.createElement('td'))
               .text(currentValue[3]);
             var minimumLapTime = $(document.createElement('td'))
-              .text(currentValue[4]);
+              .text(lapTimeString);
             
             
             tableRow.append(place);
             tableRow.append(teamName);
             tableRow.append(numLaps);
             tableRow.append(minimumLapTime);
+            
+            // CSS styling.
+            if (index == 0) {                 // Make first row really big.            
+              tableRow.css('height','3.5rem').css('z-index','2')
+                .width(tableRow.width() + 2*edgeOut)
+                .css('position','relative');/*
+                .css('left','-' + edgeOut + 'px')
+                .css('right', edgeOut + 'px')
+                ;*/
+              tableRow.children().css('font-size','1.5rem');
+            } else if (index < numBigRows) {  // Make other rows pretty big.
+              tableRow.css('height','2.5rem').css('z-index','2')
+                .width(tableRow.width() + 2*edgeOut)
+                .css('position','relative');/*
+                .css('left','-' + edgeOut + 'px')
+                .css('right', edgeOut + 'px')
+                .css('z-index','2');*/
+              tableRow.children().css('font-size','1.2rem');
+            }
           
             $('.mainTable').append(tableRow);
           }
@@ -116,20 +174,77 @@ block content
       });
       
       socket.on('update latest landmark', function(data) {
-        $('.latestLandmark').text("Latest landmark: " + data[0]);
+        $('.latestLandmark').html("<i>We've walked to</i> <b>" + data[0] + "</b> (" + data[1] +" miles!)");
+        $('.landmarksBackgroundImage').css('background-image',
+            "url('/images/landmarks/" + data[0] + ".jpg')");
       });
       
       socket.on('update next landmark', function(data) {
-        $('.nextLandmark').text("Next landmark: " + data[0] + " in " + Math.round(data[2]) + " miles!");
+        $('.nextLandmark').html("<i>Next landmark is</i> <b>" + data[0] + "</b> in <b>" + Math.round(data[2]) + "</b> miles!");
       });
       
       socket.on('update team milestone', function(data) {
-        $('.teamMilestones').text("Latest team milestone: " + data.milestoneName + " from " + data.teamName);
+        $('.teamMilestones').html("<i>Congratulations to</i><b>" + data.teamName + "</b><i> for their latest milestone:</i><b>" + data.milestoneName + "</b>");
+        $('teamMilestones > * ').css('background-color',data.teamColor)
+            .css('color',data.textColor);
+      });
+      
+      /**
+       * The bottom graphic displays the current lap distribution visually, for the top teams.
+       */
+      socket.on('update bottom graphic', function(data){
+        
+        var lapsIndex = 3; // In the incoming data array, which (second-level) index contains # laps.
+        var raceLengthMillis = 11 * 60 * 60 * 1000; // race length in millis.
+        var numRows = 5; // number of teams to show.
+        var rowsContainer = $('.rowsContainer');
+        
+        var timeRemainingMillis = timeRemaining(new Date(), endDate);
+        
+        // If race hasn't started (i.e. time remaining > race length), set completion to 100%.
+        var raceCompletionPercent;
+        if (timeRemainingMillis > raceLengthMillis) raceCompletionPercent = 1;
+        // Else, calculate race completion percent
+        else raceCompletionPercent = 1 - (timeRemainingMillis/raceLengthMillis);
+        
+        // maxLaps is the highest number of laps from any individual team.
+        var maxLaps = data[0][lapsIndex];
+        
+        // Clear out rows container
+        rowsContainer.empty();
+        
+        for (var i = 0; i < numRows && i < data.length; i++) {
+          
+          // The absolute percentage of "distance" the team has covered.
+          var absolutePercentage = 100 * raceCompletionPercent * (data[i][lapsIndex] / maxLaps);
+          
+          var newRow = $('<div></div>').addClass('runnerRow');
+          
+          var teamName = $('<div></div>').addClass('teamName')
+                            .css('background-color', data[i][1])
+                            .css('color',data[i][2])
+                            .text(data[i][0]);
+          newRow.append(teamName);
+          
+          
+          var runnerImage = $('<img></img>')
+                              .addClass('runnerImage')
+                              .attr('src','/images/runners/runner' + (i+1) + '.png')
+                              .css('left', absolutePercentage + '%')
+                              .css('background-image','url("/images/runners/runner' + (i+1) + '.png")');
+          
+          // Append runner image.
+          newRow.append(runnerImage);
+          
+          rowsContainer.append(newRow);
+          
+        }
+        
+        
       });
 
       function startTime() {
         
-        var endDate = new Date("Sat Jul 25 2015 23:00:00 GMT-0400 (Eastern Daylight Time)");
         var today=new Date();
         
         var h, m, s;
@@ -144,18 +259,22 @@ block content
         $('.time').text(h+":"+m+":"+s);
         
         // Time remaining
-        var timeRemaining = endDate.getTime() - today.getTime();
-        h = Math.round(timeRemaining / (1000 * 60 * 60));
-        timeRemaining = timeRemaining % (1000 * 60 * 60); // only minutes remain...
-        m = Math.round(timeRemaining / (1000 * 60));
-        timeRemaining = timeRemaining % (1000 * 60); // only seconds remain...
-        s = Math.round(timeRemaining / 1000);
+        var timeRemainingMillis = timeRemaining(today, endDate);
+        h = Math.round(timeRemainingMillis / (1000 * 60 * 60));
+        timeRemainingMillis = timeRemainingMillis % (1000 * 60 * 60); // only minutes remain...
+        m = Math.round(timeRemainingMillis / (1000 * 60));
+        timeRemainingMillis = timeRemainingMillis % (1000 * 60); // only seconds remain...
+        s = Math.round(timeRemainingMillis / 1000);
         m = checkTime(m);
         s = checkTime(s);
         $('.timeRemaining').text(h+":"+m+":"+s);
         
         // Refresh in 0.5 seconds
         var t = setTimeout(function(){startTime()},500);
+      }
+      
+      function timeRemaining (today, endDate){
+        return endDate.getTime() - today.getTime();
       }
 
       function checkTime(i) {
@@ -171,17 +290,33 @@ block content
         startTime();
       });
       
+  
   body
     div.container-fluid.container
       div.row-fluid.top
-        div.time
-        div.totalLaps
-        div.timeRemaining
+        table.topTable
+          tr
+            th 
+            th Time
+            th Total Laps
+            th Event Time Remaining
+            th 
+          tr
+            td 
+            td
+              div.time
+            td
+              div.totalLaps
+            td
+              div.timeRemaining
+            td 
       div.row-fluid.middle
         div.left
           div.landmarksContainer
-            div.latestLandmark
-            div.nextLandmark
+            div.landmarksBackgroundImage
+            div.landmarksInnerContainer
+              div.latestLandmark
+              div.nextLandmark
           div.lapTimeRecordsContainer
             div.lowestLapTime
             div.lowestAverageLapTime
@@ -189,6 +324,14 @@ block content
           table.table.mainTable
         div.right
           div.teamMilestonesContainer
-            div.teamMilestones
+            iframe(src="/html/confetti.html")
+            div.teamMilestones 
+              i No team milestones 
+              i to show yet!
           div.logoContainer
       div.row-fluid.bottom
+        div.startBlock 
+          div Start
+        div.rowsContainer
+        div.finishBlock 
+          div Finish

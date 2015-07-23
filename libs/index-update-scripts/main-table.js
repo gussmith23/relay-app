@@ -31,6 +31,9 @@ module.exports = function(io) {
     //console.log("Main table SQL query returned " + rows.length + " rows.");
     
     io.emit('update main table', rows);
+    
+    // Update graphic at bottom of page.
+    io.emit('update bottom graphic', rows);
   });
   
 }
